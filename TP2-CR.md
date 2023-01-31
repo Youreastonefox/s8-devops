@@ -69,16 +69,21 @@ jobs:
 **Première CI réussie :**
 ![](images/CI1-réussi.png)
 
-
-__Question 2-3 :__
+**Question 2-3 :**
 
 Objectif : Créer et sauvegarder une image Docker contenant notre application sur le Docker Hub à chaque commit sur main.
 
-On va utiliser des __variables d'environnements__ sécurisées dans Github pour stocker nos identifiants, plutôt que dans le code du repos.
+On va utiliser des **variables d'environnements** sécurisées dans Github pour stocker nos identifiants, plutôt que dans le code du repos.
 Ces variables sont sécurisées car elles sont encryptées par Github, et pas exposées en ligne dans un programme.
 Dans notre cas, on ajoute nos identifiants pour Docker Hub.
 
 ![](images/secrets.png)
 
+TODO: **Why did we put needs: build-and-test-backend on this job? Maybe try without this and you will see!**
 
-TODO: __Why did we put needs: build-and-test-backend on this job? Maybe try without this and you will see!__
+TODO: Description de ce qu'on a ajouté dans main.yml
+
+**CD réussie, on peut voir dans Docker Hub les nouvelles images qui ont été publiées après l'update de la branche main :**
+![](images/CD-images.png)
+
+TODO: **For what purpose do we need to push docker images?**
