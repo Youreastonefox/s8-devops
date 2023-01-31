@@ -24,13 +24,14 @@ Elle permet de rendre les tests suivants plus faciles :
 
 En bref, ces testcontainers sont des bibliothèques Java qui permettent d'exécuter des conteneurs Docker pendant les tests.
 
-**Question 2-2 : Créer une CI qui permet de build et test l'application à chaque commit et push sur le repository**
+**Question 2-2 : Créer une CI qui permet de build et test l'application à chaque commit et push sur le repository.**
 
-1. Créer un dossier .github/workflows, y ajouter main.yml
-   **main.yml** : Fichier qui contient l'architecture de notre pipeline. Chaque _job_ représente une étape de ce qu'on veut faire et sera exécuté en parallèle à moins que des liens ne soient spécifiés.
+Il faut commencer par créer un dossier .github/workflows, y ajouter main.yml.  
+**main.yml** : Fichier qui contient l'architecture de notre pipeline. Chaque _job_ représente une étape de ce qu'on veut faire et sera exécuté en parallèle à moins que des liens ne soient spécifiés.
 
-Description technique d'un workflow : https://docs.github.com/en/actions/using-workflows/about-workflows
-Liste des event qui peuvent trigger un workflow : https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
+Description technique d'un workflow : https://docs.github.com/en/actions/using-workflows/about-workflows  
+Syntaxe des workflow : https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_id  
+Liste des event qui peuvent trigger un workflow : https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows  
 Lien qui m'a aidé pour le Set up JDK 17 : https://github.com/actions/setup-java
 
 ```yaml
@@ -66,26 +67,79 @@ jobs:
         run: mvn clean verify --file ./api/pom.xml # Ajout du chemin vers le fichier pom.xml de l'API
 ```
 
-**Première CI réussie :**
+**Première CI réussie :**  
 ![](images/CI1-réussi.png)
 
-**Question 2-3 :**
+**Question 2-3 : Créer une CD qui permet de créer et sauvegarder une image Docker contenant notre application sur le Docker Hub à chaque commit sur main.**
 
-Objectif : Créer et sauvegarder une image Docker contenant notre application sur le Docker Hub à chaque commit sur main.
-
-On va utiliser des **variables d'environnements** sécurisées dans Github pour stocker nos identifiants, plutôt que dans le code du repos.
-Ces variables sont sécurisées car elles sont encryptées par Github, et pas exposées en ligne dans un programme.
+On va utiliser des **variables d'environnements** sécurisées dans Github pour stocker nos identifiants, plutôt que dans le code du repos.  
+Ces variables sont sécurisées car elles sont encryptées par Github, et pas exposées en ligne dans un programme.  
 Dans notre cas, on ajoute nos identifiants pour Docker Hub.
 
 ![](images/secrets.png)
 
-TODO: **Why did we put needs: build-and-test-backend on this job? Maybe try without this and you will see!**
-C'est l'identifiant unique du job. 
-The key job_id is a string and its value is a map of the job's configuration data.
+```yaml
+# define job to build and publish docker image
+build-and-push-docker-image:
+  needs: test-backend
+  # run only when code is compiling and tests are passing
+  runs-on: ubuntu-22.04
 
-TODO: Description de ce qu'on a ajouté dans main.yml
+  # steps to perform in job
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v2.5.0
+
+    - name: Login to DockerHub
+      run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_PWD }}"
+
+    - name: Build image and push backend
+      uses: docker/build-push-action@v3
+      with:
+        context: ./api
+        tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-api
+        # build on feature branches, push only on main branch
+        push: ${{ github.ref == 'refs/heads/main' }}
+
+    - name: Build image and push database
+      uses: docker/build-push-action@v3
+      with:
+        context: ./database
+        tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-database
+        push: ${{ github.ref == 'refs/heads/main' }}
+
+    - name: Build image and push httpd
+      uses: docker/build-push-action@v3
+      with:
+        context: ./http
+        tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-httpd
+        push: ${{ github.ref == 'refs/heads/main' }}
+```
+
+**Pourquoi la ligne "build-and-test-backend" est-elle nécessaire ? Que se passe-t-il si on la retire ?**
+C'est l'identifiant unique du job. Sans lui, cela engendre une erreur de syntaxe dans le workflow car les steps ne sont pas associés à un job précis.
 
 **CD réussie, on peut voir dans Docker Hub les nouvelles images qui ont été publiées après l'update de la branche main :**
 ![](images/CD-images.png)
 
-TODO: **For what purpose do we need to push docker images?**
+TODO: **Dans quel but avons-nous besoin de pousser des images docker ?**
+Cela permet de rendre les images utilisables par d'autres membres de l'équipe et d'autres machines, de plus cela peut permettre d'avoir de la documentation sur ces images.
+
+**Question 2-4 : Documenter la configuration du Quality Gate.**
+
+Objectif : Rendre le code maintenable, mettre en évidences les failles de sécurité, mieux coder, tester et avoir des push de code toujours propres.  
+**SonarCloud :** Solution cloud qui fait des analyses et des rapports sur notre code.
+
+SONAR_TOKEN : 1d1e78973e2b4c14f61adde8d82702307d9debd5
+
+<properties>
+  <sonar.organization>module-devops-4irc</sonar.organization>
+  <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+</properties>
+
+mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Youreastonefox_s8-devops
+
+Project Key : Youreastonefox_s8-devops
+Org Key : module-devops-4irc
+
+mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml

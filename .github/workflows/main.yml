@@ -27,7 +27,7 @@ jobs:
 
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn clean verify --file ./api/pom.xml # Ajout du chemin vers le fichier pom.xml de l'API
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml # Ajout du chemin vers le fichier pom.xml de l'API
 
   # define job to build and publish docker image
   build-and-push-docker-image:
