@@ -80,6 +80,8 @@ Dans notre cas, on ajoute nos identifiants pour Docker Hub.
 ![](images/secrets.png)
 
 TODO: **Why did we put needs: build-and-test-backend on this job? Maybe try without this and you will see!**
+C'est l'identifiant unique du job. 
+The key job_id is a string and its value is a map of the job's configuration data.
 
 TODO: Description de ce qu'on a ajouté dans main.yml
 
