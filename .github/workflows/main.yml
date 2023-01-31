@@ -1,0 +1,66 @@
+name: CI devops 2023
+
+on:
+  #to begin you want to launch this job in main and develop
+  push:
+    branches:
+      - "main"
+      - "tp2" # Possède le rôle de ma branche develop, dans un soucis de respect de nommage et d'organisation du repos
+  pull_request:
+    branches:
+      - "main"
+      - "tp2"
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-22.04
+    steps:
+      #checkout your github code using actions/checkout@v2.5.0
+      - uses: actions/checkout@v2.5.0
+
+      #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3.9.0
+        with:
+          distribution: corretto # Distribution obligatoire, choix de celle utilisée dans l'API
+          java-version: "17" # Utilisation JDK 17
+
+      #finally build your app with the latest command
+      - name: Build and test with Maven
+        run: mvn clean verify --file ./api/pom.xml # Ajout du chemin vers le fichier pom.xml de l'API
+
+  # define job to build and publish docker image
+  build-and-push-docker-image:
+    needs: test-backend
+    # run only when code is compiling and tests are passing
+    runs-on: ubuntu-22.04
+
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_PWD }}"
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          context: ./api
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-api
+          # build on feature branches, push only on main branch
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: ./database
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-database
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: ./http
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-httpd
+          push: ${{ github.ref == 'refs/heads/main' }}
