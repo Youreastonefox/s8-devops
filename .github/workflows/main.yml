@@ -19,13 +19,16 @@ jobs:
           distribution: corretto # Distribution obligatoire, choix de celle utilisée dans l'API
           java-version: "17" # Utilisation JDK 17
 
-      #finally build your app with the latest command
-      - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml
+      - name: Build and test with Maven backend 1
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./backend-1/pom.xml
+
+      - name: Build and test with Maven backend 2
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./backend-2/pom.xml
 
   # define job to build and publish docker image
   build-and-push-docker-image:
     runs-on: ubuntu-22.04
+    needs: test-backend
 
     # steps to perform in job
     steps:
