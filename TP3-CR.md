@@ -105,3 +105,6 @@ On ajoute la partie suivante dans la configuration de la pipeline :
     tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-front
     push: ${{ github.ref == 'refs/heads/main' }}
 ```
+
+docker build -t youreastonefox/front .
+docker run --name=front --net=app-network -d youreastonefox/front
