@@ -130,16 +130,26 @@ Cela permet de rendre les images utilisables par d'autres membres de l'équipe e
 Objectif : Rendre le code maintenable, mettre en évidences les failles de sécurité, mieux coder, tester et avoir des push de code toujours propres.  
 **SonarCloud :** Solution cloud qui fait des analyses et des rapports sur notre code.
 
-SONAR_TOKEN : 1d1e78973e2b4c14f61adde8d82702307d9debd5
+Pour configurer SonarCloud, après s'être authentifier et avoir lié le projet Github, voici les modifications nécessaites à effectuer :
 
-<properties>
+- Récupérer ces informations sur SonarCloud :
+  SONAR_TOKEN : 1d1e78973e2b4c14f61adde8d82702307d9debd5
+  Project Key : Youreastonefox_s8-devops
+  Org Key : module-devops-4irc
+
+- Ajouter ce bout de code dans pom.xml :
+
+```
+  <properties>
   <sonar.organization>module-devops-4irc</sonar.organization>
   <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-</properties>
+  </properties>
+```
 
-mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=Youreastonefox_s8-devops
+- Modifier de la commande Maven dans main.yml :
+  mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml
 
-Project Key : Youreastonefox_s8-devops
-Org Key : module-devops-4irc
+Ainsi, au push suivant on peut visualiser notre premier rapport de qualité sur SonarCloud :
+![](images/sonar.png)
 
-mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml
+On voit d'ailleurs bien que notre projet possède pas mal de failles, notamment un grand manque de tests, mais aussi des points positifs, on n'a par exemple aucune duplication de code.
