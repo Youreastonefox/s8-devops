@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   backend:
-    build: /api/simple-api-student-main/
+    build: /api/
     container_name: api
     networks:
       - app-network
@@ -12,8 +12,8 @@ services:
   database:
     build: /database/
     container_name: database
-    volumes:
-      - db-data
+    # volumes:
+    #   - dbvolume
     environment:
       - POSTGRES_PASSWORD=pwd
     networks:
@@ -35,10 +35,9 @@ services:
     networks:
       - app-network
     depends_on:
-      - api
+      - backend
 
 networks:
   app-network:
-
-volumes:
-  db-data:
+# volumes:
+#   dbvolume:
