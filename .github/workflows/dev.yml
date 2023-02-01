@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "main"
-      - "tp2" # Possède le rôle de ma branche develop, dans un soucis de respect de nommage et d'organisation du repos
+      - "tp3"
 
 jobs:
   test-backend:
