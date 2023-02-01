@@ -52,7 +52,7 @@ Test de l'inventaire : `ansible all -i inventories/setup.yml -m ping`
 
 TODO: Screen du résultat de la commande
 
-### Facts 
+### Facts
 
 **Les facts :** Ce sont des variables contenant des informations sur l'hôte. Il sont préfixés pas `ansible_` et représentent des informations dérivées des conversations avec les systèmes distants.
 
@@ -68,7 +68,7 @@ TODO: Rerun les deux dernières commandes et voir la différebce depuis qu'on a 
 
 **Question 3-2 : Documentation du playbook**
 
-### Premier Playbook 
+### Premier Playbook
 
 Création de mon premier inventaire - `playbook.yml` :
 
@@ -77,13 +77,13 @@ Création de mon premier inventaire - `playbook.yml` :
 ```
 
 Exécution du playbook : `ansible-playbook -i inventories/setup.yml first.playbook.yml`
-`--syntax-check` : Préfixe à ajouter pour tester les playbook avant des les exécuter.  
+`--syntax-check` : Préfixe à ajouter pour tester les playbook avant des les exécuter.
 
 TODO: Screen du résultat de la commande
 
 ### Playbook avancé
 
-Ce playbook nous servira à installer Docker sur notre serveur. 
+Ce playbook nous servira à installer Docker sur notre serveur.
 
 TODO: Documenter le playbook Docker
 
@@ -91,9 +91,17 @@ TODO: `ansible-playbook -i inventories/setup.yml docker.playbook.yml` puis véri
 
 ### Utiliser des rôles
 
-
-
 ...
 
 ## FRONT
 
+On ajoute la partie suivante dans la configuration de la pipeline :
+
+```
+- name: Build image and push front
+  uses: docker/build-push-action@v3
+  with:
+    context: ./front
+    tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-front
+    push: ${{ github.ref == 'refs/heads/main' }}
+```
