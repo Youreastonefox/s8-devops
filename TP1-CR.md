@@ -1,33 +1,47 @@
 # TP1 - DOCKER
 
-HTTP server : docker pull httpd
-Backend API : docker pull openjdk
-Database : docker pull postgres:14.1-alpine
+<div style="font-size:13px; font-weight:700; color:#C4C4C4; margin-bottom:30px">Louisa Chaduc - 30.01.2023</div>
 
-## Database
+## <span style="color:#D86D6F"> 0 - Initialisation </span>
 
-1. Install the appropriate image : docker pull postgres:14.1-alpine
+Commandes réalisées pour ajouter les images préconfigurées utiles à notre application, avec les versions appropriées :
 
-2. Create a folder for this image
-
-```
-database
-├─ Dockerfile
-└─
+```bash
+docker pull httpd:2.4             # HTTP server
+docker pull openjdk:17            # Backend API
+docker pull postgres:14.1-alpine  # Database
 ```
 
-3. Configure the Dockerfile
+De plus, je crée les trois dossiers nécessaires à chaque image de mon application 3-tier :
 
 ```
+s8-devops
+├─ api
+├─ http
+└─ database
+```
+
+## <span style="color:#D86D6F"> 1 - Database </span>
+
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 1-1 :</span>
+Documenter les commandes et le Dockerfile nécessaires à notre container Database commands and Dockerfile.
+</div>
+
+La première étape est de créer le fichier de configuration <span style="color:#2D9469">`Dockerfile`</span> dans le dossier de la Database et l'initialiser.
+
+
+```yaml
 FROM postgres:14.1-alpine
 
 ENV POSTGRES_DB=db \
-   POSTGRES_USER=usr
+POSTGRES_USER=usr
 
 COPY CreateScheme.sql /docker-entrypoint-initdb.d
 COPY InsertData.sql /docker-entrypoint-initdb.d
 ```
 
+Après cette configuration, voici les étapes à réaliser pour monter notre environnement 
 - Build de l'image custo de la database :
   docker build -t youreastonefox/database .
 
@@ -131,8 +145,6 @@ docker run -p "8080:8080" --net=app-network --name=api -d youreastonefox/api
 TODO: Commenter les Dockerfile
 
 ## HTTP Server
-
-docker pull httpd:2.4
 
 ```
 FROM httpd:2.4
