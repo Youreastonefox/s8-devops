@@ -1,32 +1,15 @@
-name: CI DEV
+name: CI MAIN
 
 on:
-  push:
-    branches:
-      - "main"
-      - "tp3"
+  workflow_run:
+    workflows: [CI DEV]
+    types: [completed]
+    branches: [tp3]
 
 jobs:
-  test-backend:
-    runs-on: ubuntu-22.04
-    steps:
-      #checkout your github code using actions/checkout@v2.5.0
-      - uses: actions/checkout@v2.5.0
-
-      #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3.9.0
-        with:
-          distribution: corretto # Distribution obligatoire, choix de celle utilisée dans l'API
-          java-version: "17" # Utilisation JDK 17
-
-      #finally build your app with the latest command
-      - name: Build and test with Maven
-        run: mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml
-
+  # define job to build and publish docker image
   build-and-push-docker-image:
     runs-on: ubuntu-22.04
-    needs: test-backend
 
     # steps to perform in job
     steps:
@@ -42,18 +25,18 @@ jobs:
           context: ./api
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-api
           # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/tp3' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
           context: ./database
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-database
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/tp3' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v3
         with:
           context: ./http
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-httpd
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: ${{ github.ref == 'refs/heads/tp3' }}
