@@ -19,24 +19,31 @@ jobs:
       - name: Login to DockerHub
         run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p "${{ secrets.DOCKERHUB_PWD }}"
 
-      - name: Build image and push backend
+      - name: Build image and push backend 1
         uses: docker/build-push-action@v3
         with:
-          context: ./api
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-api
+          context: ./backend-1
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/extra-backend-1
           # build on feature branches, push only on main branch
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push backend 2
+        uses: docker/build-push-action@v3
+        with:
+          context: ./backend-2
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/extra-backend-2
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
           context: ./database
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-database
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/extra-database
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v3
         with:
           context: ./http
-          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp2-httpd
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/extra-httpd
           push: ${{ github.ref == 'refs/heads/main' }}
