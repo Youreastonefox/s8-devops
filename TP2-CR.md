@@ -32,7 +32,8 @@ Il faut commencer par créer un dossier .github/workflows, y ajouter main.yml.
 Description technique d'un workflow : https://docs.github.com/en/actions/using-workflows/about-workflows  
 Syntaxe des workflow : https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_id  
 Liste des event qui peuvent trigger un workflow : https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows  
-Lien qui m'a aidé pour le Set up JDK 17 : https://github.com/actions/setup-java
+Lien qui m'a aidé pour le Set up JDK 17 : https://github.com/actions/setup-java  
+Description du fichier POM : https://maven.apache.org/guides/introduction/introduction-to-the-pom.html
 
 ```yaml
 name: CI devops 2023
