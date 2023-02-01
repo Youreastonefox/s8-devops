@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [CI DEV]
     types: [completed]
-    branches: [tp3]
+    branches: [main]
 
 jobs:
   # define job to build and publish docker image
@@ -25,18 +25,18 @@ jobs:
           context: ./api
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-api
           # build on feature branches, push only on main branch
-          push: ${{ github.ref == 'refs/heads/tp3' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
           context: ./database
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-database
-          push: ${{ github.ref == 'refs/heads/tp3' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push httpd
         uses: docker/build-push-action@v3
         with:
           context: ./http
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-httpd
-          push: ${{ github.ref == 'refs/heads/tp3' }}
+          push: ${{ github.ref == 'refs/heads/main' }}
