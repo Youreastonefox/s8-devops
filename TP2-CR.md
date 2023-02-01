@@ -154,3 +154,42 @@ Ainsi, au push suivant on peut visualiser notre premier rapport de qualité sur 
 ![](images/sonar.png)
 
 On voit d'ailleurs bien que notre projet possède pas mal de failles, notamment un grand manque de tests, mais aussi des points positifs, on n'a par exemple aucune duplication de code.
+
+**Bonus**
+
+On fait deux workflows dans deux fichiers diff
+
+dev.yml :
+
+- trigger sur les push sur tp2 et main
+
+```
+name: CI DEV
+
+on:
+  push:
+    branches:
+      - "main"
+      - "tp2"
+```
+
+main.yml :
+
+- trigger sur le workflow de dev, s'il est complété avec succès  
+  utilisation de on.workflow_run
+
+```
+name: CI MAIN
+
+on:
+  workflow_run:
+    workflows: [CI DEV]
+    types: [completed]
+    branches: [main]
+
+```
+
+Ainsi quand on push sur la branche main, la pipeline de dev (test-backend) est dans un premier temps executée.
+![](images/ci-dev-success.png)
+Une fois que la pipeline s'est terminée avec succès, la pipelaine Main (build-and-push-docker-image) se lance.
+![](images/ci-main-success.png)
