@@ -18,6 +18,8 @@
 		<jacoco-maven-plugin.version>0.8.8</jacoco-maven-plugin.version>
 		<testcontainers.version>1.17.4</testcontainers.version>
 		<validation.version>2.0.1.Final</validation.version>
+		<sonar.organization>module-devops-4irc</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 
 	<dependencies>

@@ -1,33 +1,10 @@
-name: CI devops 2023
+name: CI MAIN
 
 on:
-  #to begin you want to launch this job in main and develop
-  push:
-    branches:
-      - "main"
-      - "tp2" # Possède le rôle de ma branche develop, dans un soucis de respect de nommage et d'organisation du repos
-  pull_request:
-    branches:
-      - "main"
-      - "tp2"
-
-jobs:
-  test-backend:
-    runs-on: ubuntu-22.04
-    steps:
-      #checkout your github code using actions/checkout@v2.5.0
-      - uses: actions/checkout@v2.5.0
-
-      #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3.9.0
-        with:
-          distribution: corretto # Distribution obligatoire, choix de celle utilisée dans l'API
-          java-version: "17" # Utilisation JDK 17
-
-      #finally build your app with the latest command
-      - name: Build and test with Maven
-        run: mvn clean verify --file ./api/pom.xml # Ajout du chemin vers le fichier pom.xml de l'API
+  workflow_run:
+    workflows: [CI DEV]
+    types: [completed]
+    branches: [main]
 
   # define job to build and publish docker image
   build-and-push-docker-image:
