@@ -5,5 +5,6 @@
   docker_container:
     name: api
     image: youreastonefox/tp3-api:latest
+    pull: true
     networks:
       - name: "{{ docker_network }}"

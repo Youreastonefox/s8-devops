@@ -4,6 +4,7 @@
   docker_container:
     name: database
     image: youreastonefox/tp3-database:latest
+    pull: true
     env:
       POSTGRES_PASSWORD: "{{postgres_pwd}}"
     networks:

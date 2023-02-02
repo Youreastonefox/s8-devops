@@ -1,0 +1,3 @@
+---
+# vars file for roles/front
+docker_network: app-network

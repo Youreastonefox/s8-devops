@@ -209,3 +209,19 @@ docker_network: app-network
 ![](images/deploy.png)
 
 ## FRONT
+
+- **FRONT**: Gère le container du front.  
+  `ansible-galaxy init roles/front`  
+
+```yaml
+# /tasks/main.yml
+- name: Run Front
+  docker_container:
+    name: front
+    image: youreastonefox/tp3-front:latest
+    networks:
+      - name: "{{ docker_network }}"
+
+# /vars/main.yml
+docker_network: app-network
+```

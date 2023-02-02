@@ -4,6 +4,7 @@
   docker_container:
     name: httpd
     image: youreastonefox/tp3-httpd:latest
+    pull: true
     ports:
       - "80:80"
     networks:
