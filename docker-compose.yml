@@ -1,0 +1,45 @@
+version: "3.7"
+
+services:
+  backend:
+    build: /api/
+    container_name: api
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  database:
+    build: /database/
+    container_name: database
+    # volumes:
+    #   - dbvolume
+    environment:
+      - POSTGRES_PASSWORD=pwd
+    networks:
+      - app-network
+
+  httpd:
+    build: /http/
+    container_name: httpd
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  front:
+    build: /front/
+    container_name: front
+    ports:
+      - "8082:8082"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+networks:
+  app-network:
+# volumes:
+#   dbvolume:

@@ -40,3 +40,10 @@ jobs:
           context: ./http
           tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-httpd
           push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push front
+        uses: docker/build-push-action@v3
+        with:
+          context: ./front
+          tags: ${{secrets.DOCKERHUB_USERNAME}}/tp3-front
+          push: ${{ github.ref == 'refs/heads/main' }}
