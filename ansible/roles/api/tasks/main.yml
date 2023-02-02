@@ -1,0 +1,9 @@
+---
+# tasks file for roles/api
+
+- name: Run API
+  docker_container:
+    name: api
+    image: youreastonefox/tp3-api:latest
+    networks:
+      - name: "{{ docker_network }}"

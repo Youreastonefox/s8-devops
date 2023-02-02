@@ -1,0 +1,10 @@
+---
+# tasks file for roles/httpd
+- name: Run HTTPD
+  docker_container:
+    name: httpd
+    image: youreastonefox/tp3-httpd:latest
+    ports:
+      - "80:80"
+    networks:
+      - name: "{{ docker_network }}"
