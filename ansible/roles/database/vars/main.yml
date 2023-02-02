@@ -1,0 +1,4 @@
+---
+# vars file for roles/database
+postgres_pwd: pwd
+docker_network: app-network
