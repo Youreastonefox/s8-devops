@@ -552,5 +552,7 @@ SSLRandomSeed connect builtin
 <VirtualHost *:80>
 ProxyPreserveHost On
 ProxyPass / http://api:8080/
+ProxyPass /api http://front:80/
 ProxyPassReverse / http://api:8080/
+ProxyPassReverse /api http://front:80/
 </VirtualHost>
