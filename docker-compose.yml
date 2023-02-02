@@ -32,6 +32,8 @@ services:
   front:
     build: /front/
     container_name: front
+    ports:
+      - "8082:8082"
     networks:
       - app-network
     depends_on:
