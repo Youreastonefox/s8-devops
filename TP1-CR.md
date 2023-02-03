@@ -189,10 +189,13 @@ COPY text.txt /usr/local/apache2/conf/httpd.conf
 <div style="background: #FBEFF2; padding: 10px 16px; margin: 10px; border-radius: 10px">
 Quelques commandes découvertes : 
 <ul style="margin-bottom: 0px"> 
-<li>docker stats : </li> 
-<li>docker inspect : </li> 
-<li>docker logs : </li> 
+<li>docker stats : Permet d'avoir des infos en direct qur les container qui sont en train de tourner sur notre machine </li>
+ <img style="margin: 10px 0;" src="images/stats.png">
+<li>docker inspect : Donne des informations détaillées sur un container sous forme de JSON.</li> 
+<li>docker logs : Affiche les informations enregistrées par un conteneur en cours d'exécution.</li> 
+ <img style="margin: 10px 0;" src="images/logs.png">
 <li>docker exec : Permet d'éxecuter une commande dans l'environnement d'un container. Exemple : docker exec e30 ls - Affiche les fichiers à la raciner du container d'identifiant e30...</li> 
+ <img style="margin: 10px 0;" src="images/exec.png">
 </ul>
 </div>
 
