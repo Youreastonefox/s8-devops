@@ -1,4 +1,8 @@
-# TD3 - NOTES
+# TP3 - Ansible
+
+<div style="font-size:13px; font-weight:700; color:#C4C4C4; margin-bottom:30px">Louisa Chaduc - 01.02.2023</div>
+
+## <span style="color:#D86D6F"> 0 - Notes TD3 </span>
 
 Ansible : Outil qui permet de gérer nos serveurs, les approvisionner et déployer nos applications dessus.  
 Alternatives : Chef, Puppet, Terraform.
@@ -31,13 +35,12 @@ Démarrage du service Apache : `ansible all -m service -a "name=httpd state=star
 
 </div>
 
-# TP3 - ANSIBLE
+## <span style="color:#D86D6F"> 1 - Inventory </span>
 
-**Objectif :** Installez et déployez une application automatiquement avec ansible.
-
-## INVENTORY
-
-**Question 3-1 : Documentation de notre inventory des des commandes de base**
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 3-1 :</span>
+Documentation de notre inventory des des commandes de base
+</div>
 
 ### Premier inventaire
 
@@ -70,16 +73,25 @@ Retirer Apache : `ansible all -i inventories/setup.yml -m yum -a "name=httpd sta
 Réexécution de la commande :
 ![](images/retrait-apache-2.png)
 
-## PLAYBOOKS
+## <span style="color:#D86D6F"> 2 - Playbooks </span>
 
-**Question 3-2 : Documentation du playbook**
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 3-2 :</span>
+Documentation du playbook
+</div>
 
 ### Premier Playbook
 
-Création de mon premier inventaire - `playbook.yml` :
+Création de mon premier inventaire - `first.playbook.yml` :
 
 ```
+- hosts: all
+  gather_facts: false
+  become: yes
 
+  tasks:
+    - name: Test connection
+      ping:
 ```
 
 Exécution du playbook : `ansible-playbook -i inventories/setup.yml first.playbook.yml`  
@@ -130,7 +142,12 @@ On déplace notre playbook docker dans le role, et on appelle simplement le role
 
 Quand on relance la commande du playbook, le résultat est le même que tout à l'heure. Mais les fichiers sont mieux découpés et plus évolutifs maintenant.
 
-## DEPLOYEMENT
+## <span style="color:#D86D6F"> 3 - Continious Deployement </span>
+
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 3-3 :</span>
+Documentation du déploiement.
+</div>
 
 Je crée les rôles suivants :
 
@@ -208,10 +225,10 @@ docker_network: app-network
 ![](images/deploy-trace.png)
 ![](images/deploy.png)
 
-## FRONT
+## <span style="color:#D86D6F"> 4 - Front </span>
 
 - **FRONT**: Gère le container du front.  
-  `ansible-galaxy init roles/front`  
+  `ansible-galaxy init roles/front`
 
 ```yaml
 # /tasks/main.yml
