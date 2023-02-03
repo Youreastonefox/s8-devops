@@ -1,5 +1,9 @@
 # TP2 - GITHUB ACTIONS
 
+<div style="font-size:13px; font-weight:700; color:#C4C4C4; margin-bottom:30px">Louisa Chaduc - 31.01.2023</div>
+
+## <span style="color:#D86D6F"> 0 - Notes TD2 </span>
+
 Alternatives à Github Actions : Jenkins, Gitlab CI, Bitbucket Pipelines.  
 Les fichiers **YAML** décrivent les étapes qu'on veut voir s'exécuter le long de la pipeline.
 
@@ -11,7 +15,12 @@ Elle permet dans un premier temps de nettoyer (clear) les anciens builds encore 
 **Integration Test :** Phase de tests, précédée par les tests unitaires et généralement suivie par les tests de validation, où chacun des modules indépendants du logiciel est assemblé et testé dans l’ensemble.  
 **Component Tests :** Aussi appelés "closed-box testing", ces tests évaluent le comportement du programme sans tenir compte des détails du code sous-jacent. Ils sont effectués sur la section de code dans son intégralité, une fois le développement terminé.
 
-**Question 2-1 - Qu'est-ce que testcontainers?**
+## <span style="color:#D86D6F"> 1 - Initialisation de Github Actions et Continious Integration </span>
+
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 2-1 :</span>
+Qu'est-ce que testcontainers?
+</div>
 
 Dans cette portion de code, on voit que les testcontainers sont utilisées comme des dépendances. C'est une librairie Java qui permet d'effectuer différents types de tests : Elle utilise JUnit Tests, fournit des instances légères et jetables de bases de données communes, de navigateurs Web Selenium ou de tout autre élément pouvant s'exécuter dans un conteneur Docker.
 
@@ -24,7 +33,10 @@ Elle permet de rendre les tests suivants plus faciles :
 
 En bref, ces testcontainers sont des bibliothèques Java qui permettent d'exécuter des conteneurs Docker pendant les tests.
 
-**Question 2-2 : Créer une CI qui permet de build et test l'application à chaque commit et push sur le repository.**
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 2-2 :</span>
+Créer une CI qui permet de build et test l'application à chaque commit et push sur le repository.
+</div>
 
 Il faut commencer par créer un dossier .github/workflows, y ajouter main.yml.  
 **main.yml** : Fichier qui contient l'architecture de notre pipeline. Chaque _job_ représente une étape de ce qu'on veut faire et sera exécuté en parallèle à moins que des liens ne soient spécifiés.
@@ -69,15 +81,20 @@ jobs:
 ```
 
 **Première CI réussie :**  
-![](images/CI1-réussi.png)
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/CI1-réussi.png">
 
-**Question 2-3 : Créer une CD qui permet de créer et sauvegarder une image Docker contenant notre application sur le Docker Hub à chaque commit sur main.**
+## <span style="color:#D86D6F"> 3 - Continious Delivery </span>
+
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 2-3 :</span>
+Créer une CD qui permet de créer et sauvegarder une image Docker contenant notre application sur le Docker Hub à chaque commit sur main.
+</div>
 
 On va utiliser des **variables d'environnements** sécurisées dans Github pour stocker nos identifiants, plutôt que dans le code du repos.  
 Ces variables sont sécurisées car elles sont encryptées par Github, et pas exposées en ligne dans un programme.  
 Dans notre cas, on ajoute nos identifiants pour Docker Hub.
 
-![](images/secrets.png)
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/secrets.png">
 
 ```yaml
 # define job to build and publish docker image
@@ -121,14 +138,19 @@ build-and-push-docker-image:
 C'est l'identifiant unique du job. Sans lui, cela engendre une erreur de syntaxe dans le workflow car les steps ne sont pas associés à un job précis.
 
 **CD réussie, on peut voir dans Docker Hub les nouvelles images qui ont été publiées après l'update de la branche main :**
-![](images/CD-images.png)
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/CD-images.png">
 
-TODO: **Dans quel but avons-nous besoin de pousser des images docker ?**
+**Dans quel but avons-nous besoin de pousser des images docker ?**
 Cela permet de rendre les images utilisables par d'autres membres de l'équipe et d'autres machines, de plus cela peut permettre d'avoir de la documentation sur ces images.
 
-**Question 2-4 : Documenter la configuration du Quality Gate.**
+## <span style="color:#D86D6F"> 4 - Quality Gate </span>
 
-Objectif : Rendre le code maintenable, mettre en évidences les failles de sécurité, mieux coder, tester et avoir des push de code toujours propres.  
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 2-4 :</span>
+Documenter la configuration du Quality Gate.
+</div>
+
+**Objectif :** Rendre le code maintenable, mettre en évidences les failles de sécurité, mieux coder, tester et avoir des push de code toujours propres.  
 **SonarCloud :** Solution cloud qui fait des analyses et des rapports sur notre code.
 
 Pour configurer SonarCloud, après s'être authentifier et avoir lié le projet Github, voici les modifications nécessaites à effectuer :
@@ -151,11 +173,11 @@ Pour configurer SonarCloud, après s'être authentifier et avoir lié le projet 
   mvn -B verify sonar:sonar -Dsonar.projectKey=Youreastonefox_s8-devops -Dsonar.organization=module-devops-4irc -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{ secrets.SONAR_TOKEN }} --file ./api/pom.xml
 
 Ainsi, au push suivant on peut visualiser notre premier rapport de qualité sur SonarCloud :
-![](images/sonar.png)
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/sonar.png">
 
 On voit d'ailleurs bien que notre projet possède pas mal de failles, notamment un grand manque de tests, mais aussi des points positifs, on n'a par exemple aucune duplication de code.
 
-**Bonus**
+## <span style="color:#D86D6F"> 5 - Bonus </span>
 
 On fait deux workflows dans deux fichiers diff
 
@@ -190,6 +212,9 @@ on:
 ```
 
 Ainsi quand on push sur la branche main, la pipeline de dev (test-backend) est dans un premier temps executée.
-![](images/ci-dev-success.png)
+
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/ci-dev-success.png">
+
 Une fois que la pipeline s'est terminée avec succès, la pipelaine Main (build-and-push-docker-image) se lance.
-![](images/ci-main-success.png)
+
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/ci-main-success.png">
