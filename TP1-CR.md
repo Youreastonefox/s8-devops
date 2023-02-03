@@ -25,192 +25,287 @@ s8-devops
 
 <div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
 <span style="font-weight:400">Question 1-1 :</span>
-Documenter les commandes et le Dockerfile nécessaires à notre container Database commands and Dockerfile.
+Documenter les commandes et le Dockerfile nécessaires à notre container Database.
 </div>
 
 La première étape est de créer le fichier de configuration <span style="color:#2D9469">`Dockerfile`</span> dans le dossier de la Database et l'initialiser.
 
-
 ```yaml
+# Utilisation de l'image préconfigurée pour PostgreSQl
+# Version alpine = version allegée
 FROM postgres:14.1-alpine
 
+# Variables d'environnement utiles à la connexion à la BD
+# On ne place pas le mot de passe ici pour des questions de sécurité
+# Il ne faut jamais que de telles données sensibles soient présentes en dur dans notre code source
 ENV POSTGRES_DB=db \
 POSTGRES_USER=usr
 
+# Copie des scripts d'initialisation de la BD dans la configuration de l'image
 COPY CreateScheme.sql /docker-entrypoint-initdb.d
 COPY InsertData.sql /docker-entrypoint-initdb.d
 ```
 
-Après cette configuration, voici les étapes à réaliser pour monter notre environnement 
-- Build de l'image custo de la database :
-  docker build -t youreastonefox/database .
+Après cette configuration, voici les étapes à réaliser pour **monter notre environnement** :
+
+- Build de l'image custo de la database :  
+  <span style="color:#2D9469">`docker build -t youreastonefox/database .`</span>
 
 - Création du network :  
-  docker network create app-network
+  <span style="color:#2D9469">`docker network create app-network`</span>
 
-- Import de l'image de l'adminer :
-  git pull adminer
+- Création du volume :  
+  <span style="color:#2D9469">`docker volume create dbvolume`</span>  
+  Le volume nous permet de garder en mémoire les modifications appliquées à la BD, même après le redémarrage du container.
 
-- Run database :
-  docker run --name=database --net=app-network -e POSTGRES_PASSWORD=pwd -d -v dbvolume:/var/lib/postgresql/data youreastonefox/database
+- Import de l'image de l'adminer, notre client SQL qui permet d'accéder à la database :  
+  <span style="color:#2D9469">`docker pull adminer`</span>
 
-- Run adminer : (hote:container)
-  docker run -p "8090:8080" --name=adminer --net=app-network -d adminer
+- Exécution du container de la database et de l'adminer :  
+  <span style="color:#2D9469">`docker run --name=database --net=app-network -e POSTGRES_PASSWORD=pwd -d -v dbvolume:/var/lib/postgresql/data youreastonefox/database`</span>  
+  <span style="color:#2D9469">`docker run -p "8090:8080" --name=adminer --net=app-network -d adminer`</span>
 
-Adminer est le client SQL qui permet d'accéder à la database.
+<div style="background: #FBEFF2; padding: 10px 16px; margin: 10px; border-radius: 10px">
+Description des paramètres ajoutés :  
+<ul style="margin-bottom: 0px"> 
+<li>--name : Définition du nom du container.</li> 
+<li>--net : Définition du réseau du container, permet dans ce cas à admniner et database de communiquer.</li> 
+<li>-e : Définition de variables d'environnement utilisées à l'exécution de l'image du container, dans notre cas le mot de passe de la DB (soucis de sécurité précisé précedemment).</li> 
+<li>-d : Exécuter le container en arrière plan.</li> 
+<li>-v : Définir le volume associé au container.</li> 
+<li>-p : Mapping des ports pour exposer le container.</li> 
+</ul>
+</div>
 
-- Identification à la BD
-  Postgresql
-  database
-  usr
-  pwd
-  db
+**Connexion à la BD depuis l'adresse http://localhost:8090 :**
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/db.png">
 
-- Volume : docker volume create dbvolume
-  Décrire le comportement d'un volume
-  On ne sait pas bien où c'est stocké mais on voit que ça fonctionne
-  Why do we need a volume to be attached to our postgres container?
+## <span style="color:#D86D6F"> 2 - API </span>
 
-## API
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 1-2 :</span>
+Documenter les commandes et le Dockerfile nécessaires à notre container API et expliquer l'intérêt du Multistage.
+</div>
 
-### Basics
+### Création d'une base d'API
 
-- Import de l'image de l'openjdk :
-  docker pull openjdk:17
+- Initialisation du Dockerfile dedié à cette tâche :
 
-- Build de l'image custo de l'api :
-  docker build -t youreastonefox/api .
-
-- Run api :
-  docker run --name=api --net=app-network -d youreastonefox/api
-
-```
+```yaml
+# Import de l'image préconfiguré pour utiliser Javascript
+# Choix de la version 17 car compatible à ma version de Java en locale et nécessaire pour la suite du TP
 FROM openjdk:17
 
+# Ajout du fichier Java compilé que l'on veut exécuter dans notre container
 COPY Main.class .
 
+# Exécution de la commande `Java Main`
 CMD ["java", "Main"]
 ```
 
-TODO: Screen du hello world
+- Import de l'image de l'openjdk version 17 :  
+  <span style="color:#2D9469">`docker pull openjdk:17`</span>
 
-### Multistage build
+- Build de l'image custo de l'api :  
+  <span style="color:#2D9469">`docker build -t youreastonefox/api .`</span>
 
-```
-# FROM openjdk:11
-# Build Main.java
-# TODO : in next steps (not now)
+- Exécution du container api :  
+  <span style="color:#2D9469">`docker run --name=api --net=app-network -d youreastonefox/api`</span>
 
-# FROM openjdk:11-jre
-# Copy resource from previous stage
-# COPY --from=0 /usr/src/Main.class .
-# Run java code with the JRE
-# TODO : in next steps (not now)
+**Résultat en console :**
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/helloworld.png">
 
+### Multistage
 
-# FROM openjdk:17
+Après avoir généré mon projet Springboot et ajouté mon GreetingController, je fais évoluer mon Dockerfile pour utiliser le build en Multistage :
 
-# COPY Main.class .
+```yaml
+# BUILD
 
-# CMD ["java", "Main"]
-
-# Build
+# Utilisation de l'image préconfigurée de Maven (besoin pour Springboot)
 FROM maven:3.8.6-amazoncorretto-17 AS myapp-build
+# Variable d'environnement de la base de mon App
 ENV MYAPP_HOME /
+# Définition du Working Directory avec ma variable
 WORKDIR $MYAPP_HOME
+# Copie des fichiers de configuration du projet dans le Docker
 COPY pom.xml .
 COPY src ./src
+# Exécution du package Maven
 RUN mvn package -DskipTests
 
-# Run
+# RUN
+
+# Utilisation de l'image préconfigurée de l'OpenJDK pour Amazon
 FROM amazoncorretto:17
 ENV MYAPP_HOME /
 WORKDIR $MYAPP_HOME
 COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar
 
+# Définition du point d'entrée de l'API
 ENTRYPOINT java -jar myapp.jar
 ```
 
+<div style="background: #FBEFF2; padding: 10px 16px; margin: 10px; border-radius: 10px">
+Dnas un premier temps, on utilise le Mulstistaging pour séparer les tâches  
+</div>
+
+À ce niveau là, on met à jour le contenu de notre application avec le code source de simple-api-student-main et on effectue le parcours suivant pour arriver à l'accès de notre API en ligne sur http://localhost :
+
+- Edition de <span style="color:#2D9469">`application.yml`</span> pour connecter la BD :
+
+```yaml
+datasource:
+  url: jdbc:postgresql://database:5432/db
+  username: usr
+  password: pwd
+```
+
 - Import de maven :
-  docker pull maven:3.8.6-amazoncorretto-17
+  <span style="color:#2D9469">`docker pull maven:3.8.6-amazoncorretto-17`</span>
 
 - Build de l'image custo de l'api :
-  docker build -t youreastonefox/api .
+  <span style="color:#2D9469">`docker build -t youreastonefox/api .`</span>
 
-- Run api :
-  docker run -p "8080:8080" --name=api -d youreastonefox/api
+- Exécution du container api :
+  <span style="color:#2D9469">`docker run -p "8080:8080" --name=api -d youreastonefox/api`</span>
 
-docker run -p "8080:8080" --net=app-network --name=api -d youreastonefox/api
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/api.png">
 
-TODO: Commenter les Dockerfile
+## <span style="color:#D86D6F"> 3 - HTTP Server </span>
 
-## HTTP Server
+Voici le Dockerfile nécessaire à lancer mon container :
 
-```
+```yaml
+# Utilisation de l'image préconfigurée d'HTTPD version 2.4
 FROM httpd:2.4
 
-COPY . /usr/local/apache2/htdocs/
+# Copy de la page web à exposer en configuration de l'image
+COPY index.html /usr/local/apache2/htdocs/
+# Copy du fichier de configuration qui sera utilisé au chargement de l'image pour pouvoir avoir u Reverse Proxy
+COPY text.txt /usr/local/apache2/conf/httpd.conf
 ```
 
-docker stats
-docker inspect
-docker logs
-docker exec
+<div style="background: #FBEFF2; padding: 10px 16px; margin: 10px; border-radius: 10px">
+Quelques commandes découvertes : 
+<ul style="margin-bottom: 0px"> 
+<li>docker stats : </li> 
+<li>docker inspect : </li> 
+<li>docker logs : </li> 
+<li>docker exec : Permet d'éxecuter une commande dans l'environnement d'un container. Exemple : docker exec e30 ls - Affiche les fichiers à la raciner du container d'identifiant e30...</li> 
+</ul>
+</div>
 
-/usr/local/apache2/conf/httpd.conf
+- Build de l'image custo du serveur :
+  <span style="color:#2D9469">`docker build -t youreastonefox/httpdserver .`</span>
 
-docker build -t youreastonefox/httpdserver .
-docker run --net=app-network --name httpdserver -p 80:80 -d youreastonefox/httpdserver
+- Exécution du container httpd :
+  <span style="color:#2D9469">`docker run --net=app-network --name httpdserver -p 80:80 -d youreastonefox/httpdserver`</span>
 
-docker exec e30 ls : retourne
-bin
-build
-cgi-bin
-conf
-error
-htdocs
-icons
-include
-logs
-modules
+- Récupération de :
+  <span style="color:#2D9469">`docker run --net=app-network --name httpdserver -p 80:80 -d youreastonefox/httpdserver`</span>
+  docker exec e30 cat /usr/local/apache2/conf/httpd.conf : retourne le contenu de ce fichier de configuration
 
-docker exec e30 cat /usr/local/apache2/conf/httpd.conf : retourne le contenu de ce fichier de configuration
+Le Reverse Proxy permet d’avoir un seul point d’entrée par l’exterieur sur notre application, et moins de ports sont ouverts plus notre application est sécurisée. Tout le flux httpd passe par un seul endroit (le container http) donc on peut gérer la sécurité à cet endroit seulement (whitelist et blacklist par exemple).  
+Cela nous permettra également de faire du load balancing.  
+Pour le configurer, on ajoute dans notre fichier de config httpd.conf le code suivant et on avctive les modules proxy_mod et prox_httpd_mod :
 
-TODO: Why do we need a reverse proxy?
-TODO: Commenter ce qu'on a fait dans le fichier text.txt, copié dans le dockerfile dans la conf approprié, pour que ce soit chargé avec l'image.
+```
+<VirtualHost \*:80>
+ProxyPreserveHost On
+ProxyPass / http://api:8080/
+ProxyPassReverse / http://api:8080/
+</VirtualHost>
+```
 
-- Ajout de :  
-   <VirtualHost \*:80>
-  ProxyPreserveHost On
-  ProxyPass / http://api:8080/
-  ProxyPassReverse / http://api:8080/
-  </VirtualHost>
-- Décommenter la ligne 142 et 145
+## <span style="color:#D86D6F"> 4 - Docker Compose </span>
 
-## Docker Compose
+<div style="border: 1px solid #AB1B1B; padding: 8px; background: #FBEFF2; font-weight:300; margin-bottom:20px">
+<span style="font-weight:400">Question 1-3 & 1-4 :</span>
+Documenter les commandes principales et la configuration nécessaires à l'utilisation de docker-compose.
+</div>
 
-1-3 Document docker-compose most important commands.  
-1-4 Document your docker-compose file.
+Docker compose nous permet d'automatiser tous les build et run de nos container, et lancer notre application en une ligne de commande : <span style="color:#2D9469">`docker compose up`</span>
 
-Seule commande utilisée : docker composer up
-TODO: Commenter le fichier docker-composer
-TODO: Trouver d'autres commandes à utiliser et les expliquer
-TODO: Screen de docker et du rendu dans le navigateur
+Fichier de configuration :
+
+```yaml
+version: "3.7"
+
+# Chaque service représenta la gestion d'un container
+services:
+  backend:
+    # Lien vers le Dockerfile de notre container
+    build: /api/simple-api-student-main/
+    #  Nom du container
+    container_name: api
+    # Réseau sur lequel est publié le container
+    networks:
+      - app-network
+    # Permet de lancer le build de ce container après la fin de celui de la BD
+    depends_on:
+      - database
+
+  database:
+    build: /database/
+    container_name: database
+    # Mapping du volume
+    volumes:
+      - dbvolume
+    # Variable d'environnement du mot de passe de la BD
+    environment:
+      - POSTGRES_PASSWORD=pwd
+    networks:
+      - app-network
+
+  httpd:
+    build: /http/
+    container_name: httpd
+    # Mapping des ports
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+# Initialisation des réseaux utilisés dans notre config
+networks:
+  app-network:
+
+# Pareil pour les volumes
+volumes:
+  dbvolume:
+```
+
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/compose.png">
 
 ## Docker Hub
 
-docker login
+On utilise finalement Docker Hub pour publier nos images et les rendre ainsi accessible en ligne. Dans une entreprise, tous les développeurs ont ainsi accès à la même configuration Docker. De plus, on aura accès à de meilleures descriptions de nos images.
 
-docker tag my-database USERNAME/my-database:1.0
+Il faut pour cela s'identifier : <span style="color:#2D9469">`docker login`</span>
 
+Puis créer des tag de nos images :
+
+```
 docker tag tp1-backend youreastonefox/tp1-backend:1-0
 docker tag tp1-httpd youreastonefox/tp1-httpd:1-0
 docker tag tp1-database youreastonefox/tp1-database:1-0
+```
 
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/tag.png">
+
+Et enfin pousser nos images sur le Docker Hub :
+
+```
 docker push youreastonefox/tp1-backend:1-0
 docker push youreastonefox/tp1-httpd:1-0
 docker push youreastonefox/tp1-database:1-0
+```
 
-TODO: Ajouter les screens
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/push.png">
 
-https://hub.docker.com/repositories/youreastonefox
+Visualisation de nos images en ligne :
+
+<img style="border-radius:10px;box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px; margin: 20px 50px; width: calc(100% - 100px);" src="images/hub.png">
